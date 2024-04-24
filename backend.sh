@@ -38,5 +38,6 @@ dnf install nodejs -y &>>$LOGFILE
 VALIDATE $? "installing the nodejs"
 
 useradd expense
+VALIDATE $? "useradd expense"
 
 
