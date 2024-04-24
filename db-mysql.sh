@@ -27,11 +27,11 @@ fi
 dnf install mysql-server -y &>>$LOGFILE
 VALIDATE $? "installing mysql sever"
 
-systemctl enable mysqld
-VALIDATE $? "enable the mysqld" &>>$LOGFILE
+systemctl enable mysqld &>>$LOGFILE
+VALIDATE $? "Enabling MySQL Server"
 
-systemctl start mysqld
-VALIDATE $? "start the mysqld" &>>$LOGFILE
+systemctl start mysqld &>>$LOGFILE
+VALIDATE $? "Starting MySQL Server"
 
 #mysql_secure_installation --set-root-pass ExpenseApp@1 &>>$LOGFILE
 #ALIDATE $? "setting the root password"
