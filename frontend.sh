@@ -46,4 +46,7 @@ VALIDATE $? "frontend code"
 cd /usr/share/nginx/html
 unzip /tmp/frontend.zip
 
-cp 
+cp /home/ec2-user/expense-shell/expense.conf /etc/nginx/default.d/expense.conf
+
+systemctl restart nginx
+VALIDATE $? "restart the nginx"
