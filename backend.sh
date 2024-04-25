@@ -8,7 +8,6 @@ R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
-
 echo "Please enter DB password:"
 read -s mysql_root_password
 
@@ -30,55 +29,56 @@ else
     echo "You are super user."
 fi
 
-
 dnf module disable nodejs -y &>>$LOGFILE
-VALIDATE $? "disable the nodejs"
+VALIDATE $? "Disabling default nodejs"
 
 dnf module enable nodejs:20 -y &>>$LOGFILE
-VALIDATE $? "enable the 20 nodejs version"
+VALIDATE $? "Enabling nodejs:20 version"
 
 dnf install nodejs -y &>>$LOGFILE
-VALIDATE $? "installing the nodejs"
+VALIDATE $? "Installing nodejs"
 
-id expense 
-
+id expense &>>$LOGFILE
 if [ $? -ne 0 ]
 then
-    useradd expense
+    useradd expense &>>$LOGFILE
+    VALIDATE $? "Creating expense user"
 else
-    echo -e "expense user already created.. $Y skipping $N"
-fi       
+    echo -e "Expense user already created...$Y SKIPPING $N"
+fi
 
 mkdir -p /app &>>$LOGFILE
-VALIDATE $? "creating app directory"
+VALIDATE $? "Creating app directory"
 
 curl -o /tmp/backend.zip https://expense-builds.s3.us-east-1.amazonaws.com/expense-backend-v2.zip &>>$LOGFILE
-VALIDATE $? "download the backendcode"
+VALIDATE $? "Downloading backend code"
 
-cd /app &>>$LOGFILE
+cd /app
 rm -rf /app/*
-unzip /tmp/backend.zip 
-VALIDATE $? "unzip backend code"
-npm install &>>$LOGFILE
-VALIDATE $? "install denpendencies"
+unzip /tmp/backend.zip &>>$LOGFILE
+VALIDATE $? "Extracted backend code"
 
-cp /home/ec2-user/expense-shell/backend.service  /etc/systemd/system/backend.service &>>$LOGFILE
-VALIDATE $? "copied backend service"
+npm install &>>$LOGFILE
+VALIDATE $? "Installing nodejs dependencies"
+
+#check your repo and path
+cp /home/ec2-user/expense-shell/backend.service /etc/systemd/system/backend.service &>>$LOGFILE
+VALIDATE $? "Copied backend service"
 
 systemctl daemon-reload &>>$LOGFILE
-VALIDATE $? "daemon reload"
+VALIDATE $? "Daemon Reload"
 
 systemctl start backend &>>$LOGFILE
-VALIDATE "start backend"
+VALIDATE $? "Starting backend"
 
 systemctl enable backend &>>$LOGFILE
-VALIDATE "enable backend"
+VALIDATE $? "Enabling backend"
 
 dnf install mysql -y &>>$LOGFILE
-VALIDATE $? "install mysql client"
+VALIDATE $? "Installing MySQL Client"
 
-mysql -h db.srikantheswar.online -uroot -p${mysql_root_password} < /app/schema/backend.sql &>>$LOGFILE
-VALIDATE $? "scheme loading"
+mysql -h db.daws78s.online -uroot -p${mysql_root_password} < /app/schema/backend.sql &>>$LOGFILE
+VALIDATE $? "Schema loading"
 
 systemctl restart backend &>>$LOGFILE
-VALIDATE $? "restart backend"
+VALIDATE $? "Restarting Backend"
